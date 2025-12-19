@@ -251,7 +251,8 @@ def delete_short(short_id):
 
 
 @app.route("/shorts/<int:short_id>/like", methods=["POST"])
-def like_short(short_id):
+def like_short_post(short_id):
+
     user = session.get("user")
     if not user:
         flash("You must be logged in to like a short.", "warning")
