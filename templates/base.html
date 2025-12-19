@@ -120,8 +120,9 @@
       <a href="{{ url_for('shorts_feed') }}">Buzz Shorts</a>
       <a href="{{ url_for('upload_short') }}">Upload Short</a>
 
-      <!-- ⭐ ADDED THIS -->
-      <a href="{{ url_for('channels') }}">More...</a>
+      {% if session.get('user') %}
+        <a href="{{ url_for('channels') }}">More...</a>
+      {% endif %}
 
       {% if session.get('admin') %}
         <a href="{{ url_for('admin_dashboard') }}">Admin</a>
