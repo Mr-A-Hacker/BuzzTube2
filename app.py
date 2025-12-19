@@ -23,7 +23,7 @@ def init_db():
     conn = get_db()
     cur = conn.cursor()
 
-    # Users table
+    # Users
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,7 +35,7 @@ def init_db():
         )
     """)
 
-    # Videos (⭐ FIXED: added channel_id)
+    # Videos
     cur.execute("""
         CREATE TABLE IF NOT EXISTS videos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,7 +47,7 @@ def init_db():
         )
     """)
 
-    # Channels (⭐ NEW TABLE)
+    # Channels
     cur.execute("""
         CREATE TABLE IF NOT EXISTS channels (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -77,7 +77,7 @@ def init_db():
         )
     """)
 
-    # Messages (Public Chat)
+    # Messages
     cur.execute("""
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -128,7 +128,7 @@ def init_db():
         )
     """)
 
-    # Blocked IPs (⭐ REQUIRED because your middleware queries it)
+    # Blocked IPs
     cur.execute("""
         CREATE TABLE IF NOT EXISTS blocked_ips (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -139,10 +139,10 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Initialize DB at startup
+# Initialize DB
 init_db()
 
-# Middleware: block requests if IP is in blocked list
+# Middleware: block requests if IP is blocked
 @app.before_request
 def check_ip_block():
     ip = request.remote_addr
@@ -151,9 +151,8 @@ def check_ip_block():
     cur.execute("SELECT 1 FROM blocked_ips WHERE ip_address=?", (ip,))
     if cur.fetchone():
         conn.close()
-        abort(403)  # Forbidden
+        abort(403)
     conn.close()
-
 
 # Premium decorator
 def premium_required(f):
@@ -177,7 +176,7 @@ def premium_required(f):
         if user["premium"] == 0:
             start = session.get("login_time", 0)
             now = int(time.time())
-            if now - start > 600:  # 10 minutes
+            if now - start > 600:
                 session.clear()
                 flash("Your free 10‑minute session expired. Upgrade to premium!", "danger")
                 return redirect(url_for("login"))
@@ -185,16 +184,22 @@ def premium_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# Route: like a short
+@app.route("/like_short/<int:short_id>")
+def like_short(short_id):
+    if "user" not in session:
+        flash("You must log in to like shorts.", "warning")
+        return redirect(url_for("login"))
+
+    user = session["user"]
     conn = get_db()
     cur = conn.cursor()
 
-    # Check if user already liked this short
-    cur.execute("SELECT 1 FROM short_likes WHERE short_id=? AND user=?", (short_id, user))
+    cur.execute("SELECT 1 FROM likes WHERE short_id=? AND user=?", (short_id, user))
     if cur.fetchone():
         flash("You've already liked this short.", "info")
     else:
-        # Record the like
-        cur.execute("INSERT INTO short_likes (short_id, user) VALUES (?, ?)", (short_id, user))
+        cur.execute("INSERT INTO likes (short_id, user) VALUES (?, ?)", (short_id, user))
         cur.execute("UPDATE shorts SET likes = likes + 1 WHERE id=?", (short_id,))
         conn.commit()
         flash("Short liked!", "success")
@@ -202,19 +207,6 @@ def premium_required(f):
     conn.close()
     return redirect(url_for("shorts_feed"))
 
-    # Check if user already liked this short
-    cur.execute("SELECT 1 FROM short_likes WHERE short_id=? AND user=?", (short_id, user))
-    if cur.fetchone():
-        flash("You've already liked this short.", "info")
-    else:
-        # Record the like
-        cur.execute("INSERT INTO short_likes (short_id, user) VALUES (?, ?)", (short_id, user))
-        cur.execute("UPDATE shorts SET likes = likes + 1 WHERE id=?", (short_id,))
-        conn.commit()
-        flash("Short liked!", "success")
-
-    conn.close()
-    return redirect(url_for("shorts_feed"))
 
 
 
