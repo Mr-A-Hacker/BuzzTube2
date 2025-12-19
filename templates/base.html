@@ -108,6 +108,7 @@
   </style>
 </head>
 <body>
+
   <!-- Navigation -->
   <div class="navbar">
     <div class="nav-left">
@@ -118,10 +119,15 @@
       <a href="{{ url_for('profile') }}">Profile</a>
       <a href="{{ url_for('shorts_feed') }}">Buzz Shorts</a>
       <a href="{{ url_for('upload_short') }}">Upload Short</a>
+
+      <!-- ⭐ ADDED THIS -->
+      <a href="{{ url_for('channels') }}">More...</a>
+
       {% if session.get('admin') %}
         <a href="{{ url_for('admin_dashboard') }}">Admin</a>
       {% endif %}
     </div>
+
     <div class="nav-right">
       {% if session.get('user') %}
         <a href="{{ url_for('settings') }}" class="btn settings-btn">⚙️ Settings</a>
@@ -133,6 +139,7 @@
       {% endif %}
     </div>
   </div>
+
   <!-- Page Content -->
   <div class="container">
     {% block content %}{% endblock %}
@@ -143,28 +150,12 @@
     <div class="premium-content">
       <h1 style="color:#ffd700; text-shadow:0 0 10px #ffcc00;">🌟 Premium Membership</h1>
       <p class="neon-text">Request Premium access. An admin will review your request.</p>
-      
-       <div class="nav-left">
-  <a href="{{ url_for('home') }}">Home</a>
-  <a href="{{ url_for('leaderboard') }}">Leaderboard</a>
-  <a href="{{ url_for('publichat') }}">Public Chat</a>
-  <a href="{{ url_for('upload') }}">Upload</a>
-  <a href="{{ url_for('profile') }}">Profile</a>
-  <a href="{{ url_for('shorts_feed') }}">Buzz Shorts</a>
-  <a href="{{ url_for('upload_short') }}">Upload Short</a>
-  {% if session.get('admin') %}
-    <a href="{{ url_for('admin_dashboard') }}">Admin</a>
-    <a href="{{ url_for('admin_shorts') }}">Manage Shorts</a>  <!-- NEW TAB -->
-  {% endif %}
-</div>
 
-      <!-- Request Premium button -->
       <button class="btn premium-btn" onclick="requestPremium()">Request Premium</button>
-      
-      <!-- Close button -->
       <button class="btn settings-btn" onclick="closePremium()">Close</button>
     </div>
   </div>
+
 <script>
   function openPremium() {
     document.getElementById("premium-popup").style.display = "flex";
