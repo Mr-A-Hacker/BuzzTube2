@@ -297,6 +297,57 @@ def like_short(short_id):
 
 
 
+@app.route("/channels")
+def channels():
+    conn = sqlite3.connect("buzz.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, name, owner, pic FROM channels")
+    channels = [dict(id=row[0], name=row[1], owner=row[2], pic=row[3]) for row in cursor.fetchall()]
+    conn.close()
+    return render_template("channels.html", channels=channels)
+
+@app.route("/create_channel", methods=["GET", "POST"])
+def create_channel():
+    if request.method == "POST":
+        name = request.form["name"]
+        pic = request.files["pic"]
+
+        filename = name.replace(" ", "_") + ".png"
+        filepath = os.path.join("static/channels", filename)
+        pic.save(filepath)
+
+        owner = session["user"]
+
+        conn = sqlite3.connect("buzz.db")
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO channels (name, owner, pic) VALUES (?, ?, ?)",
+                       (name, owner, filepath))
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for("channels"))
+
+    return render_template("create_channel.html")
+
+@app.route("/channel/<int:channel_id>")
+def channel(channel_id):
+    conn = sqlite3.connect("buzz.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, name, owner, pic FROM channels WHERE id=?", (channel_id,))
+    row = cursor.fetchone()
+    channel = dict(id=row[0], name=row[1], owner=row[2], pic=row[3])
+
+    cursor.execute("SELECT id, title, filepath FROM videos WHERE channel_id=?", (channel_id,))
+    videos = [dict(id=v[0], title=v[1], filepath=v[2]) for v in cursor.fetchall()]
+
+    conn.close()
+    return render_template("channel.html", channel=channel, videos=videos)
+
+
+
+
+
 @app.route("/shorts/upload", methods=["GET", "POST"])
 def upload_short():
     if request.method == "POST":
