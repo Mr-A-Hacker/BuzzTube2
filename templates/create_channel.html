@@ -1,0 +1,12 @@
+<h1 class="neon-text big-title">Create Channel</h1>
+<form action="{{ url_for('create_channel') }}" method="POST" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">Channel Name</label>
+    <input type="text" name="name" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Channel Picture</label>
+    <input type="file" name="pic" class="form-control" required>
+  </div>
+  <button type="submit" class="btn three-d-btn">Create</button>
+</form>
