@@ -35,14 +35,25 @@ def init_db():
         )
     """)
 
-    # Videos
+    # Videos (⭐ FIXED: added channel_id)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS videos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             uploader TEXT NOT NULL,
             filepath TEXT,
-            likes INTEGER DEFAULT 0
+            likes INTEGER DEFAULT 0,
+            channel_id INTEGER
+        )
+    """)
+
+    # Channels (⭐ NEW TABLE)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS channels (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            owner TEXT NOT NULL,
+            pic TEXT
         )
     """)
 
@@ -117,6 +128,14 @@ def init_db():
         )
     """)
 
+    # Blocked IPs (⭐ REQUIRED because your middleware queries it)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS blocked_ips (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ip_address TEXT UNIQUE
+        )
+    """)
+
     conn.commit()
     conn.close()
 
@@ -134,6 +153,7 @@ def check_ip_block():
         conn.close()
         abort(403)  # Forbidden
     conn.close()
+
 
 # Premium decorator
 def premium_required(f):
