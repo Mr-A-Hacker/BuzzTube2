@@ -7,7 +7,7 @@
   <!-- Neon Styling -->
   <style>
     body {
-      background-color: #000;
+      background-color: #000000;
       color: #ff66cc;
       font-family: Arial, sans-serif;
       margin: 0;
@@ -28,20 +28,43 @@
       font-weight: bold;
     }
     .navbar a:hover {
-      color: #fff;
+      color: #ffffff;
       text-shadow: 0 0 5px #ff66cc, 0 0 10px #ff33aa;
     }
-    .container { max-width: 900px; margin: 20px auto; padding: 20px; }
-    .neon-text { color: #ff66cc; text-shadow: 0 0 5px #ff66cc, 0 0 10px #ff33aa; }
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+    .neon-text {
+      color: #ff66cc;
+      text-shadow: 0 0 5px #ff66cc, 0 0 10px #ff33aa;
+    }
     .big-title { font-size: 2.5em; margin-bottom: 20px; }
-    .card { background-color: #1a1a1a; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 0 15px #ff33aa; }
+    .card {
+      background-color: #1a1a1a;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 15px #ff33aa;
+    }
     .btn {
-      background-color: #ff33aa; color: #fff; border: none;
-      padding: 8px 12px; border-radius: 6px; cursor: pointer;
-      margin-right: 5px; box-shadow: 0 0 15px #ff33aa;
+      background-color: #ff33aa;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 5px;
+      box-shadow: 0 0 15px #ff33aa;
       transition: all 0.3s ease;
     }
-    .btn:hover { background-color: #ff66cc; color: #000; transform: scale(1.05); box-shadow: 0 0 25px #ff66cc; }
+    .btn:hover {
+      background-color: #ff66cc;
+      color: #000;
+      transform: translateZ(5px) scale(1.05);
+      box-shadow: 0 0 25px #ff66cc;
+    }
     .settings-btn { background: #222; color: #fff; box-shadow: 0 0 10px #555; }
     .premium-btn {
       background: linear-gradient(45deg, #ffd700, #ffcc00);
@@ -51,7 +74,34 @@
       border: 2px solid #ffcc00; border-radius: 6px;
       padding: 8px 12px; transition: all 0.3s ease;
     }
-    .premium-btn:hover { background: linear-gradient(45deg, #ffcc00, #ffe066); box-shadow: 0 0 20px #ffd700, 0 0 40px #ffcc00; transform: scale(1.05); }
+    .premium-btn:hover {
+      background: linear-gradient(45deg, #ffcc00, #ffe066);
+      box-shadow: 0 0 20px #ffd700, 0 0 40px #ffcc00;
+      transform: scale(1.05);
+    }
+    .flash { padding: 10px; margin: 10px 0; border-radius: 6px; }
+    .flash.success { background-color: #330033; color: #ff66cc; }
+    .flash.danger { background-color: #330000; color: #ff3333; }
+    .flash.warning { background-color: #332200; color: #ffcc00; }
+    .flash.info { background-color: #001a33; color: #66ccff; }
+    .video-list { list-style: none; padding: 0; }
+    .video-list li { margin-bottom: 20px; }
+    .meta { font-size: 0.9em; color: #aaa; }
+    .neon-label { color: #ff66cc; font-weight: bold; text-shadow: 0 0 6px #ff33aa; margin-bottom: 6px; display: block; }
+    .neon-input, textarea, input[type="file"] {
+      width: 100%; padding: 12px 16px; border: 1px solid rgba(255,102,204,0.4);
+      border-radius: 12px; background-color: #0a0a0a; color: #ff66cc;
+      font-size: 1rem; font-weight: 600; outline: none;
+      box-shadow: inset 0 0 10px rgba(255,51,170,0.35),
+                  inset 0 0 20px rgba(255,102,204,0.25),
+                  0 0 10px rgba(255,51,170,0.35),
+                  0 0 20px rgba(255,102,204,0.45);
+      transform: perspective(800px) translateZ(8px);
+      transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease, background .25s ease;
+    }
+    .neon-input::placeholder, textarea::placeholder { color: #ff99dd; text-shadow: 0 0 6px #ff33aa; font-style: italic; opacity: .9; }
+    .neon-input:hover, textarea:hover, input[type="file"]:hover { border-color: rgba(255,102,204,0.7); }
+    .neon-input:focus, textarea:focus { border-color: #ff66cc; }
     .premium-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 9999; }
     .premium-content { background: #1a1a1a; padding: 30px; border-radius: 12px; box-shadow: 0 0 25px #ffd700; text-align: center; max-width: 500px; animation: glowPulse 2s infinite alternate; }
     @keyframes glowPulse { from { box-shadow: 0 0 25px #ffd700; } to { box-shadow: 0 0 45px #ffcc00; } }
@@ -68,10 +118,8 @@
       <a href="{{ url_for('profile') }}">Profile</a>
       <a href="{{ url_for('shorts_feed') }}">Buzz Shorts</a>
       <a href="{{ url_for('upload_short') }}">Upload Short</a>
-      <a href="{{ url_for('channels') }}">More...</a> <!-- NEW TAB -->
       {% if session.get('admin') %}
         <a href="{{ url_for('admin_dashboard') }}">Admin</a>
-        <a href="{{ url_for('admin_shorts') }}">Manage Shorts</a>
       {% endif %}
     </div>
     <div class="nav-right">
@@ -85,7 +133,6 @@
       {% endif %}
     </div>
   </div>
-
   <!-- Page Content -->
   <div class="container">
     {% block content %}{% endblock %}
@@ -96,14 +143,35 @@
     <div class="premium-content">
       <h1 style="color:#ffd700; text-shadow:0 0 10px #ffcc00;">🌟 Premium Membership</h1>
       <p class="neon-text">Request Premium access. An admin will review your request.</p>
+      
+       <div class="nav-left">
+  <a href="{{ url_for('home') }}">Home</a>
+  <a href="{{ url_for('leaderboard') }}">Leaderboard</a>
+  <a href="{{ url_for('publichat') }}">Public Chat</a>
+  <a href="{{ url_for('upload') }}">Upload</a>
+  <a href="{{ url_for('profile') }}">Profile</a>
+  <a href="{{ url_for('shorts_feed') }}">Buzz Shorts</a>
+  <a href="{{ url_for('upload_short') }}">Upload Short</a>
+  {% if session.get('admin') %}
+    <a href="{{ url_for('admin_dashboard') }}">Admin</a>
+    <a href="{{ url_for('admin_shorts') }}">Manage Shorts</a>  <!-- NEW TAB -->
+  {% endif %}
+</div>
+
+      <!-- Request Premium button -->
       <button class="btn premium-btn" onclick="requestPremium()">Request Premium</button>
+      
+      <!-- Close button -->
       <button class="btn settings-btn" onclick="closePremium()">Close</button>
     </div>
   </div>
-
 <script>
-  function openPremium() { document.getElementById("premium-popup").style.display = "flex"; }
-  function closePremium() { document.getElementById("premium-popup").style.display = "none"; }
+  function openPremium() {
+    document.getElementById("premium-popup").style.display = "flex";
+  }
+  function closePremium() {
+    document.getElementById("premium-popup").style.display = "none";
+  }
   function requestPremium() {
     fetch("{{ url_for('request_premium') }}", { method: "POST" })
       .then(response => {
@@ -116,5 +184,6 @@
       });
   }
 </script>
+
 </body>
 </html>
