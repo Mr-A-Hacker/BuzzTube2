@@ -296,6 +296,42 @@ def like_short(short_id):
     return redirect(url_for("shorts_feed"))
 
 
+@app.route("/channels")
+def channels():
+    conn = sqlite3.connect("buzz.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM channels")
+    channels = cursor.fetchall()
+    conn.close()
+    return render_template("channels.html", channels=channels)
+
+@app.route("/create_channel", methods=["GET","POST"])
+def create_channel():
+    if request.method == "POST":
+        name = request.form["name"]
+        pic = save_file(request.files["pic"])  # helper to save image
+        owner = session["username"]
+        conn = sqlite3.connect("buzz.db")
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO channels (name, owner, pic) VALUES (?, ?, ?)", (name, owner, pic))
+        conn.commit()
+        conn.close()
+        return redirect(url_for("channels"))
+    return render_template("create_channel.html")
+
+@app.route("/channel/<int:channel_id>")
+def channel(channel_id):
+    conn = sqlite3.connect("buzz.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM channels WHERE id=?", (channel_id,))
+    channel = cursor.fetchone()
+    cursor.execute("SELECT * FROM videos WHERE channel_id=?", (channel_id,))
+    videos = cursor.fetchall()
+    conn.close()
+    return render_template("channel.html", channel=channel, videos=videos)
+
+
+
 
 @app.route("/more")
 def more_content():
