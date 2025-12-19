@@ -297,6 +297,32 @@ def like_short(short_id):
 
 
 
+@app.route("/more")
+def more_content():
+    conn = sqlite3.connect("buzz.db")
+    cursor = conn.cursor()
+
+    # Example: load next 10 videos (pagination)
+    cursor.execute("SELECT id, title, uploader, premium, filepath, likes FROM videos LIMIT 10 OFFSET 10")
+    videos = [
+        {
+            "id": row[0],
+            "title": row[1],
+            "uploader": row[2],
+            "premium": row[3],
+            "filepath": row[4],
+            "likes": row[5]
+        }
+        for row in cursor.fetchall()
+    ]
+    conn.close()
+
+    return render_template("more.html", videos=videos)
+
+
+
+
+
 @app.route("/shorts/upload", methods=["GET", "POST"])
 def upload_short():
     if request.method == "POST":
