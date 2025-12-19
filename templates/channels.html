@@ -1,0 +1,12 @@
+<h1 class="neon-text big-title">Channels</h1>
+<a href="{{ url_for('create_channel') }}" class="btn three-d-btn">+ Create Channel</a>
+<div class="row mt-4">
+  {% for c in channels %}
+  <div class="col-md-4 card three-d-card">
+    <img src="{{ c[3] }}" class="img-fluid rounded mb-2">
+    <h2>{{ c[1] }}</h2>
+    <p>Owner: {{ c[2] }}</p>
+    <a href="{{ url_for('channel', channel_id=c[0]) }}" class="btn three-d-btn">Enter Channel</a>
+  </div>
+  {% endfor %}
+</div>
