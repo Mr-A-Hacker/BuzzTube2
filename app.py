@@ -13,6 +13,9 @@ UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
+# ⭐ FIX: Ensure channels folder exists (prevents Railway crash)
+os.makedirs("static/channels", exist_ok=True)
+
 # --- Database helper ---
 def get_db():
     conn = sqlite3.connect(DB_FILE)
@@ -206,6 +209,7 @@ def like_short(short_id):
 
     conn.close()
     return redirect(url_for("shorts_feed"))
+
 
 
 
