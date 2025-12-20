@@ -203,6 +203,40 @@ def premium_required(f):
 
 
 
+@app.route("/apps/chat/dm/<username>", methods=["GET", "POST"])
+def dm_chat(username):
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        msg = request.form.get("message")
+        if msg:
+            conn = get_db()
+            cur = conn.cursor()
+            cur.execute("INSERT INTO dm_messages (sender, receiver, message) VALUES (?, ?, ?)",
+                        (session["user"], username, msg))
+            conn.commit()
+            conn.close()
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT * FROM dm_messages
+        WHERE (sender=? AND receiver=?) OR (sender=? AND receiver=?)
+        ORDER BY timestamp ASC
+    """, (session["user"], username, username, session["user"]))
+    messages = cur.fetchall()
+    conn.close()
+
+    return render_template("dm_chat.html", messages=messages, partner=username)
+
+
+
+
+
+
+
+
 @app.route("/live/<int:id>")
 def watch_live(id):
     conn = get_db()
