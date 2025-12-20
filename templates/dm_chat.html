@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+  <h1 class="neon-text big-title">Chat with {{ partner }}</h1>
+
+  <div class="card" style="max-height:400px; overflow-y:auto; margin-bottom:15px;">
+    {% for m in messages %}
+      <p style="margin:6px 0;">
+        <strong>{{ m['sender'] }}:</strong> {{ m['message'] }}
+      </p>
+    {% else %}
+      <p class="meta">No messages yet. Say hi!</p>
+    {% endfor %}
+  </div>
+
+  <form method="POST">
+    <input type="text" name="message" placeholder="Type a message…" required style="width:75%;">
+    <button class="btn" style="width:20%;">Send</button>
+  </form>
+
+</div>
+
+{% endblock %}
