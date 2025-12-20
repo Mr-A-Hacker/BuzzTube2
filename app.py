@@ -551,15 +551,28 @@ def video(id):
 @app.route("/upload", methods=["GET", "POST"])
 @premium_required
 def upload():
+    conn = get_db()
+    cur = conn.cursor()
+
+    # Load channels owned by the logged-in user
+    cur.execute("SELECT id, name FROM channels WHERE owner=?", (session["user"],))
+    channels = cur.fetchall()
+
     if request.method == "POST":
         title = request.form.get("title")
+        channel_id = request.form.get("channel_id")  # ⭐ NEW
+        file = request.files.get("file")
+
         if not title:
             flash("Title is required.", "danger")
             return redirect(url_for("upload"))
 
-        file = request.files.get("file")
         if not file or file.filename.strip() == "":
             flash("No file selected.", "danger")
+            return redirect(url_for("upload"))
+
+        if not channel_id:
+            flash("Please select a channel.", "danger")
             return redirect(url_for("upload"))
 
         try:
@@ -570,14 +583,11 @@ def upload():
 
             web_path = url_for("static", filename=f"uploads/{filename}")
 
-            conn = get_db()
-            cur = conn.cursor()
             cur.execute(
-                "INSERT INTO videos (title, uploader, filepath) VALUES (?, ?, ?)",
-                (title, session["user"], web_path)
+                "INSERT INTO videos (title, uploader, filepath, channel_id) VALUES (?, ?, ?, ?)",
+                (title, session["user"], web_path, channel_id)
             )
             conn.commit()
-            conn.close()
 
             flash("Video uploaded successfully!", "success")
             return redirect(url_for("home"))
@@ -586,7 +596,8 @@ def upload():
             flash(f"Upload failed: {e}", "danger")
             return redirect(url_for("upload"))
 
-    return render_template("upload.html")
+    conn.close()
+    return render_template("upload.html", channels=channels)
 
 
 @app.route("/leaderboard")
