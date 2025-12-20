@@ -226,6 +226,85 @@ def premium_required(f):
     return decorated_function
 
 
+# -------------------------
+# BuzzTube Chat+ (Phase 1)
+# -------------------------
+
+@app.route("/apps/chat")
+def chat_home():
+    if "user" not in session:
+        flash("You must be logged in to use Chat+.", "warning")
+        return redirect(url_for("login"))
+    return render_template("chat_home.html")
+@app.route("/apps/chat/dms")
+def dm_list():
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT DISTINCT 
+            CASE 
+                WHEN sender = ? THEN receiver 
+                ELSE sender 
+            END AS partner
+        FROM dm_messages
+        WHERE sender = ? OR receiver = ?
+    """, (session["user"], session["user"], session["user"]))
+    partners = cur.fetchall()
+    conn.close()
+
+    return render_template("dm_list.html", partners=partners)
+
+
+@app.route("/apps/chat/dm/<username>", methods=["GET", "POST"])
+def dm_chat(username):
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        msg = request.form.get("message")
+        if msg:
+            conn = get_db()
+            cur = conn.cursor()
+            cur.execute(
+                "INSERT INTO dm_messages (sender, receiver, message) VALUES (?, ?, ?)",
+                (session["user"], username, msg)
+            )
+            conn.commit()
+            conn.close()
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT * FROM dm_messages
+        WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?)
+        ORDER BY timestamp ASC
+    """, (session["user"], username, username, session["user"]))
+    messages = cur.fetchall()
+    conn.close()
+
+    return render_template("dm_chat.html", messages=messages, partner=username)
+@app.route("/apps/chat/find_friends")
+def find_friends():
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT username FROM users WHERE username != ?", (session["user"],))
+    users = cur.fetchall()
+    conn.close()
+
+    return render_template("find_friends.html", users=users)
+
+
+
+
+
+
+
 
 @app.route("/apps/chat/dm/<username>", methods=["GET", "POST"])
 def dm_chat(username):
