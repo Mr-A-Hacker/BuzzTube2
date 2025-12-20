@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+  <h1 class="neon-text big-title">Find Friends</h1>
+
+  <div class="card">
+    <ul class="user-list">
+      {% for u in users %}
+        <li style="margin-bottom:10px;">
+          {{ u['username'] }}
+          <a href="{{ url_for('dm_chat', username=u['username']) }}" class="btn" style="margin-left:10px;">
+            Message
+          </a>
+        </li>
+      {% else %}
+        <li class="meta">No other users yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+{% endblock %}
