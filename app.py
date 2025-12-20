@@ -60,13 +60,15 @@ def init_db():
         )
     """)
 
-    # Likes (for shorts)
+    # Likes (for shorts + videos)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS likes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             short_id INTEGER,
+            video_id INTEGER,
             user TEXT,
-            UNIQUE(short_id, user)
+            UNIQUE(short_id, user),
+            UNIQUE(video_id, user)
         )
     """)
 
@@ -139,11 +141,23 @@ def init_db():
         )
     """)
 
+    # ⭐ NEW: Livestreams table (GitHub + Railway compatible)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS livestreams (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            user TEXT NOT NULL,
+            stream_url TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
     conn.commit()
     conn.close()
 
 # Initialize DB
 init_db()
+
 
 # Middleware: block requests if IP is blocked
 @app.before_request
