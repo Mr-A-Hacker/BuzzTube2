@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+  <h1 class="neon-text big-title">Private Messages</h1>
+
+  <div class="card">
+    <ul class="user-list">
+      {% for p in partners %}
+        <li style="margin-bottom:10px;">
+          <a href="{{ url_for('dm_chat', username=p['partner']) }}" class="btn">
+            Chat with {{ p['partner'] }}
+          </a>
+        </li>
+      {% else %}
+        <li class="meta">No conversations yet. Go to Find Friends to start one.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+{% endblock %}
