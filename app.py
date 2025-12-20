@@ -201,6 +201,26 @@ def premium_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
+
+@app.route("/live/<int:id>")
+def watch_live(id):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM livestreams WHERE id=?", (id,))
+    stream = cur.fetchone()
+    conn.close()
+
+    if not stream:
+        flash("Livestream not found.", "danger")
+        return redirect(url_for("home"))
+
+    return render_template("watch_live.html", stream=stream)
+
+
+
+
+
 # Route: like a short
 @app.route("/like_short/<int:short_id>")
 def like_short(short_id):
