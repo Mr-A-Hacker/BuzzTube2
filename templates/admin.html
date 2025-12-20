@@ -187,7 +187,26 @@
       {% endfor %}
     </ul>
   </div>
+
+  <!-- ⭐ NEW: Channels Section -->
+  <div class="card">
+    <h2 class="neon-text">Channels</h2>
+    <ul class="channel-list">
+      {% for ch in channels %}
+        <li>
+          <strong>{{ ch['name'] }}</strong>
+          <span class="meta">Channel #{{ ch['id'] }} • Owner: {{ ch['owner'] }}</span>
+
+          <form action="{{ url_for('admin_delete_channel', channel_id=ch['id']) }}" method="POST" style="display:inline;">
+            <button type="submit" class="btn danger">Delete Channel</button>
+          </form>
+        </li>
+      {% else %}
+        <li class="meta">No channels found.</li>
+      {% endfor %}
+    </ul>
+  </div>
+
 </div>
 
 {% endblock %}
-
