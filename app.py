@@ -13,7 +13,7 @@ UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-# ⭐ FIX: Ensure channels folder exists (prevents Railway crash)
+# ⭐ Ensure channels folder exists (prevents Railway crash)
 os.makedirs("static/channels", exist_ok=True)
 
 # --- Database helper ---
@@ -26,7 +26,7 @@ def init_db():
     conn = get_db()
     cur = conn.cursor()
 
-    # Users
+    # Users (with profile picture + last_seen for online status)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,7 +34,9 @@ def init_db():
             username TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
             premium INTEGER DEFAULT 0,
-            ip_address TEXT
+            ip_address TEXT,
+            pfp TEXT,
+            last_seen INTEGER
         )
     """)
 
@@ -82,7 +84,7 @@ def init_db():
         )
     """)
 
-    # Messages
+    # Public Chat Messages
     cur.execute("""
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -141,7 +143,7 @@ def init_db():
         )
     """)
 
-    # ⭐ NEW: Livestreams table (GitHub + Railway compatible)
+    # ⭐ Livestreams table (GitHub + Railway compatible)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS livestreams (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -152,11 +154,33 @@ def init_db():
         )
     """)
 
+    # ⭐ Private DM Messages for Chat+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS dm_messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sender TEXT NOT NULL,
+            receiver TEXT NOT NULL,
+            message TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # ⭐ Friends system for Find Friends / social graph
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS friends (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user1 TEXT NOT NULL,
+            user2 TEXT NOT NULL,
+            UNIQUE(user1, user2)
+        )
+    """)
+
     conn.commit()
     conn.close()
 
 # Initialize DB
 init_db()
+
 
 
 # Middleware: block requests if IP is blocked
