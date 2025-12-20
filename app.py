@@ -226,6 +226,37 @@ def like_short(short_id):
 
 
 
+@app.route("/go_live", methods=["GET", "POST"])
+def go_live():
+    if "user" not in session:
+        flash("You must be logged in to go live.", "warning")
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        title = request.form.get("title")
+        stream_url = request.form.get("stream_url")  # HLS .m3u8 URL
+
+        if not title or not stream_url:
+            flash("All fields are required.", "danger")
+            return redirect(url_for("go_live"))
+
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO livestreams (title, user, stream_url) VALUES (?, ?, ?)",
+            (title, session["user"], stream_url)
+        )
+        conn.commit()
+        conn.close()
+
+        flash("Livestream added!", "success")
+        return redirect(url_for("home"))
+
+    return render_template("go_live.html")
+
+
+
+
 
 
 @app.route("/admin/shorts")
