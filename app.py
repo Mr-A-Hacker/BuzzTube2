@@ -379,6 +379,20 @@ def like_short_post(short_id):
 
 
 
+@app.route("/apps/chat")
+def chat_home():
+    if "user" not in session:
+        flash("You must be logged in to use Chat+.", "warning")
+        return redirect(url_for("login"))
+    return render_template("chat_home.html")
+
+
+
+
+
+
+
+
 @app.route("/channels")
 def channels():
     conn = sqlite3.connect("buzz.db")
