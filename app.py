@@ -741,6 +741,10 @@ def follow_user(username):
 
     conn.close()
     return redirect(url_for("profile"))
+# -------------------------
+# ADMIN DASHBOARD
+# -------------------------
+
 @app.route("/admin")
 def admin_dashboard():
     if not session.get("admin"):
@@ -749,20 +753,32 @@ def admin_dashboard():
 
     conn = get_db()
     cur = conn.cursor()
+
     cur.execute("SELECT * FROM videos")
     videos = cur.fetchall()
+
     cur.execute("SELECT * FROM comments")
     comments = cur.fetchall()
+
     cur.execute("SELECT * FROM users")
     users = cur.fetchall()
+
     cur.execute("SELECT * FROM reports")
     reports = cur.fetchall()
+
     cur.execute("SELECT * FROM messages")
     messages = cur.fetchall()
+
     cur.execute("SELECT * FROM blocked_ips")
     blocked_ips = cur.fetchall()
+
     cur.execute("SELECT * FROM premium_requests ORDER BY id DESC")
     premium_requests = cur.fetchall()
+
+    # ⭐ NEW: Load channels
+    cur.execute("SELECT * FROM channels")
+    channels = cur.fetchall()
+
     conn.close()
 
     return render_template("admin.html",
@@ -772,93 +788,135 @@ def admin_dashboard():
                            reports=reports,
                            messages=messages,
                            blocked_ips=blocked_ips,
-                           premium_requests=premium_requests)
+                           premium_requests=premium_requests,
+                           channels=channels)
 
+
+# -------------------------
+# DELETE VIDEO
+# -------------------------
 
 @app.route("/admin/delete_video/<int:id>", methods=["POST"])
 def admin_delete_video(id):
     if not session.get("admin"):
         return redirect(url_for("home"))
+
     conn = get_db()
     cur = conn.cursor()
     cur.execute("DELETE FROM videos WHERE id=?", (id,))
     conn.commit()
     conn.close()
+
     flash("Video deleted.", "info")
     return redirect(url_for("admin_dashboard"))
 
+
+# -------------------------
+# DELETE COMMENT
+# -------------------------
 
 @app.route("/admin/delete_comment/<int:id>", methods=["POST"])
 def admin_delete_comment(id):
     if not session.get("admin"):
         return redirect(url_for("home"))
+
     conn = get_db()
     cur = conn.cursor()
     cur.execute("DELETE FROM comments WHERE id=?", (id,))
     conn.commit()
     conn.close()
+
     flash("Comment deleted.", "info")
     return redirect(url_for("admin_dashboard"))
 
+
+# -------------------------
+# DELETE MESSAGE
+# -------------------------
 
 @app.route("/admin/delete_message/<int:id>", methods=["POST"])
 def admin_delete_message(id):
     if not session.get("admin"):
         return redirect(url_for("home"))
+
     conn = get_db()
     cur = conn.cursor()
     cur.execute("DELETE FROM messages WHERE id=?", (id,))
     conn.commit()
     conn.close()
+
     flash("Message deleted.", "info")
     return redirect(url_for("admin_dashboard"))
 
+
+# -------------------------
+# GRANT PREMIUM
+# -------------------------
 
 @app.route("/admin/grant_premium/<int:id>", methods=["POST"])
 def admin_grant_premium(id):
     if not session.get("admin"):
         return redirect(url_for("home"))
+
     conn = get_db()
     cur = conn.cursor()
     cur.execute("UPDATE users SET premium=1 WHERE id=?", (id,))
     conn.commit()
     conn.close()
+
     flash("Premium granted.", "success")
     return redirect(url_for("admin_dashboard"))
 
+
+# -------------------------
+# KICK USER
+# -------------------------
 
 @app.route("/admin/kick_user/<int:id>", methods=["POST"])
 def admin_kick_user(id):
     if not session.get("admin"):
         return redirect(url_for("home"))
+
     conn = get_db()
     cur = conn.cursor()
     cur.execute("DELETE FROM users WHERE id=?", (id,))
     conn.commit()
     conn.close()
+
     flash("User kicked.", "info")
     return redirect(url_for("admin_dashboard"))
 
+
+# -------------------------
+# MARK REPORT REVIEWED
+# -------------------------
 
 @app.route("/admin/mark_report_reviewed/<int:id>", methods=["POST"])
 def admin_mark_report_reviewed(id):
     if not session.get("admin"):
         return redirect(url_for("home"))
+
     conn = get_db()
     cur = conn.cursor()
     cur.execute("UPDATE reports SET status='reviewed' WHERE id=?", (id,))
     conn.commit()
     conn.close()
+
     flash("Report marked as reviewed.", "success")
     return redirect(url_for("admin_dashboard"))
 
 
-# ✅ Block/Unblock IP routes
+# -------------------------
+# BLOCK / UNBLOCK IP
+# -------------------------
+
 @app.route("/admin/block_ip", methods=["POST"])
 def admin_block_ip():
     if not session.get("admin"):
         return redirect(url_for("home"))
+
     ip = request.form.get("ip")
+
     if ip:
         conn = get_db()
         cur = conn.cursor()
@@ -869,50 +927,102 @@ def admin_block_ip():
         except sqlite3.IntegrityError:
             flash(f"{ip} is already blocked.", "warning")
         conn.close()
+
     return redirect(url_for("admin_dashboard"))
+
 
 @app.route("/admin/unblock_ip", methods=["POST"])
 def admin_unblock_ip():
     if not session.get("admin"):
         return redirect(url_for("home"))
+
     ip = request.form.get("ip")
+
     conn = get_db()
     cur = conn.cursor()
     cur.execute("DELETE FROM blocked_ips WHERE ip_address=?", (ip,))
     conn.commit()
     conn.close()
+
     flash(f"Unblocked {ip}", "info")
     return redirect(url_for("admin_dashboard"))
 
 
-# ✅ Premium request management
+# -------------------------
+# PREMIUM REQUESTS
+# -------------------------
+
 @app.route("/admin/grant_premium_request/<int:request_id>", methods=["POST"])
 def admin_grant_premium_request(request_id):
     if not session.get("admin"):
         return redirect(url_for("home"))
+
     conn = get_db()
     cur = conn.cursor()
+
     cur.execute("UPDATE premium_requests SET status='granted' WHERE id=?", (request_id,))
     cur.execute("""
         UPDATE users SET premium=1 
         WHERE username=(SELECT username FROM premium_requests WHERE id=?)
     """, (request_id,))
+
     conn.commit()
     conn.close()
+
     flash("Premium request granted.", "success")
     return redirect(url_for("admin_dashboard"))
+
 
 @app.route("/admin/reject_premium_request/<int:request_id>", methods=["POST"])
 def admin_reject_premium_request(request_id):
     if not session.get("admin"):
         return redirect(url_for("home"))
+
     conn = get_db()
     cur = conn.cursor()
+
     cur.execute("UPDATE premium_requests SET status='rejected' WHERE id=?", (request_id,))
     conn.commit()
     conn.close()
+
     flash("Premium request rejected.", "info")
     return redirect(url_for("admin_dashboard"))
+
+
+# -------------------------
+# DELETE CHANNEL (NEW)
+# -------------------------
+
+@app.route("/admin/delete_channel/<int:channel_id>", methods=["POST"])
+def admin_delete_channel(channel_id):
+    if not session.get("admin"):
+        return redirect(url_for("home"))
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    # Get channel picture
+    cur.execute("SELECT pic FROM channels WHERE id=?", (channel_id,))
+    channel = cur.fetchone()
+
+    # Delete videos inside the channel
+    cur.execute("DELETE FROM videos WHERE channel_id=?", (channel_id,))
+
+    # Delete the channel
+    cur.execute("DELETE FROM channels WHERE id=?", (channel_id,))
+
+    conn.commit()
+    conn.close()
+
+    # Delete channel picture file
+    if channel and channel["pic"]:
+        pic_path = os.path.join("static/channels", channel["pic"])
+        if os.path.exists(pic_path):
+            os.remove(pic_path)
+
+    flash("Channel deleted.", "info")
+    return redirect(url_for("admin_dashboard"))
+
 if __name__ == "__main__":
     init_db()
     app.run(host="0.0.0.0", port=5000, debug=True)
