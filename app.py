@@ -1034,19 +1034,7 @@ def admin_kick_user(id):
 # MARK REPORT REVIEWED
 # -------------------------
 
-@app.route("/admin/mark_report_reviewed/<int:id>", methods=["POST"])
-def admin_mark_report_reviewed(id):
-    if not session.get("admin"):
-        return redirect(url_for("home"))
 
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("UPDATE reports SET status='granted' WHERE id=?", (id,))
-    conn.commit()
-    conn.close()
-
-    flash("Report marked as reviewed.", "success")
-    return redirect(url_for("admin_dashboard"))
 # -------------------------
 # REPORT SYSTEM (USER REPORTS)
 # -------------------------
