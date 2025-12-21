@@ -357,33 +357,6 @@ def like_short(short_id):
 
 
 
-@app.route("/apps/chat/dms")
-def dm_list():
-    if "user" not in session:
-        return redirect(url_for("login"))
-
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT DISTINCT 
-            CASE 
-                WHEN sender = ? THEN receiver 
-                ELSE sender 
-            END AS partner
-        FROM dm_messages
-        WHERE sender = ? OR receiver = ?
-    """, (session["user"], session["user"], session["user"]))
-    partners = cur.fetchall()
-    conn.close()
-
-    return render_template("dm_list.html", partners=partners)
-
-
-
-
-
-
-
 @app.route("/go_live", methods=["GET", "POST"])
 def go_live():
     if "user" not in session:
