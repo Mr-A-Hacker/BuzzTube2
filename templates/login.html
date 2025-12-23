@@ -1,32 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="neon-text big-title">Login</h1>
+<div class="login-container">
+  <h1 class="neon-title">Login</h1>
 
-<form method="POST">
-  <div class="neon-field">
-    <label class="neon-label" for="email">Email</label>
-    <input type="email" id="email" name="email" class="neon-input" 
-           placeholder="Enter your email" required>
-  </div>
+  <form method="POST" class="neon-form">
+    <div class="neon-field">
+      <label for="email" class="neon-label">Email</label>
+      <input type="email" id="email" name="email" class="neon-input" placeholder="Enter your email" required>
+    </div>
 
-  <div class="neon-field">
-    <label class="neon-label" for="username">Username</label>
-    <input type="text" id="username" name="username" class="neon-input" 
-           placeholder="Enter your username" required>
-  </div>
+    <div class="neon-field">
+      <label for="username" class="neon-label">Username</label>
+      <input type="text" id="username" name="username" class="neon-input" placeholder="Enter your username" required>
+    </div>
 
-  <div class="neon-field">
-    <label class="neon-label" for="password">Password</label>
-    <input type="password" id="password" name="password" class="neon-input" 
-           placeholder="Enter your password" required>
-  </div>
+    <div class="neon-field">
+      <label for="password" class="neon-label">Password</label>
+      <input type="password" id="password" name="password" class="neon-input" placeholder="Enter your password" required>
+    </div>
 
-  <button type="submit" class="btn">Login</button>
-</form>
+    <button type="submit" class="neon-button">Login</button>
+  </form>
 
-<p style="margin-top:20px; color:#ff99dd; text-align:center;">
-  Don’t have an account?
-  <a href="{{ url_for('signup') }}" style="color:#ff66cc; text-shadow:0 0 6px #ff33aa;">Sign up here</a>
-</p>
+  <p class="neon-link">
+    Don’t have an account?
+    <a href="{{ url_for('signup') }}">Sign up here</a>
+  </p>
+</div>
 {% endblock %}
