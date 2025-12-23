@@ -74,21 +74,24 @@ body {
 .card:hover { transform: scale(1.02); }
 
 /* === Buttons === */
-.btn {
+.btn,
+.neon-button {
   display: inline-block;
-  background: linear-gradient(to right, #ff00cc, #6600ff);
-  color: #fff;
-  padding: 0.6rem 1.2rem;
+  background: #ff00cc;
+  color: #000;
+  padding: 0.8rem 1.5rem;
   margin: 0.5rem 0.3rem;
   border-radius: 8px;
   font-weight: bold;
   text-decoration: none;
   transition: 0.3s ease;
-  box-shadow: 0 0 10px #ff00cc;
+  box-shadow: 0 0 10px #ff00cc, 0 0 20px #ff33aa;
 }
-.btn:hover {
-  background: linear-gradient(to right, #6600ff, #ff00cc);
-  box-shadow: 0 0 15px #ff00cc;
+.btn:hover,
+.neon-button:hover {
+  background: #ff33aa;
+  color: #fff;
+  box-shadow: 0 0 15px #ff00cc, 0 0 25px #ff33aa;
 }
 
 .btn.danger {
@@ -141,50 +144,41 @@ body {
   font-weight: bold;
 }
 
-.flash.success { 
-  background: #6600ff; 
-  color: #fff; 
-}
-
-.flash.warning { 
-  background: #ff6f00; 
-  color: #fff; 
-}
-
-.flash.danger  { 
-  background: #ff1744; 
-  color: #fff; 
-}
-
-.flash.info    { 
-  background: #00bcd4; 
-  color: #fff; 
-}
+.flash.success { background: #6600ff; color: #fff; }
+.flash.warning { background: #ff6f00; color: #fff; }
+.flash.danger  { background: #ff1744; color: #fff; }
+.flash.info    { background: #00bcd4; color: #fff; }
 
 /* === Forms === */
-form label {
+form label,
+.neon-label {
   display: block;
   margin-top: 1rem;
   font-weight: bold;
+  color: #ff99dd;
+  text-shadow: 0 0 6px #ff33aa;
 }
 
 form input[type="text"],
 form input[type="password"],
+form input[type="email"],
 form textarea,
-form select {
+form select,
+.neon-input {
   width: 100%;
-  padding: 0.6rem;
+  padding: 0.8rem;
   margin-top: 0.3rem;
-  border: none;
+  border: 1px solid #ff00cc;
   border-radius: 6px;
-  background: #1a1a1a;
-  color: #f0f0f0;
-  box-shadow: inset 0 0 5px #6600ff;
+  background: #111;
+  color: #fff;
+  box-shadow: 0 0 8px #ff00cc;
+  transition: 0.3s ease;
 }
-
-form textarea {
-  resize: vertical;
-  min-height: 100px;
+form input:focus,
+.neon-input:focus {
+  outline: none;
+  box-shadow: 0 0 12px #ff33aa, 0 0 20px #ff00cc;
 }
 
 /* === Lists === */
