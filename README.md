@@ -1,3 +1,10 @@
+> ## 👋 Start Here
+> A later BuzzTube development project. **For users:** explore another stage of the custom video-platform experiment.
+>
+> **Safety:** Use security, camera, scanning, and network features only on systems and networks you own or are explicitly authorized to test.
+
+---
+
 # 📺 BuzzTube
 
 BuzzTube is a LAN‑only social hub built with **Flask + SQLite + Bootstrap**.  
